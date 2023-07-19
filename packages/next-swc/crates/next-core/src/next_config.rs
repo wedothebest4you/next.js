@@ -431,6 +431,9 @@ pub struct ExperimentalConfig {
     pub turbotrace: Option<serde_json::Value>,
     pub external_middleware_rewrites_resolve: Option<bool>,
     pub scroll_restoration: Option<bool>,
+    /// Enables server actions. Using this feature will enable the
+    /// `react@experimental` for the `app` directory. @see https://nextjs.org/docs/app/api-reference/functions/server-actions
+    server_actions: Option<bool>,
 
     // ---
     // UNSUPPORTED
@@ -481,9 +484,6 @@ pub struct ExperimentalConfig {
     /// directory.
     ppr: Option<bool>,
     proxy_timeout: Option<f64>,
-    /// Enables server actions. Using this feature will enable the
-    /// `react@experimental` for the `app` directory. @see https://nextjs.org/docs/app/api-reference/functions/server-actions
-    server_actions: Option<bool>,
     /// Allows adjusting body parser size limit for server actions.
     server_actions_body_size_limit: Option<SizeLimit>,
     /// enables the minification of server code.
@@ -716,6 +716,13 @@ impl NextConfig {
     pub async fn skip_trailing_slash_redirect(self: Vc<Self>) -> Result<Vc<bool>> {
         Ok(Vc::cell(
             self.await?.skip_trailing_slash_redirect.unwrap_or(false),
+        ))
+    }
+
+    #[turbo_tasks::function]
+    pub async fn enable_server_actions(self: Vc<Self>) -> Result<Vc<bool>> {
+        Ok(Vc::cell(
+            self.await?.experimental.server_actions.unwrap_or(false),
         ))
     }
 }
